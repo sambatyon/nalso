@@ -4,17 +4,20 @@
  * @date Nov 5, 2009
  * @author arojasp
  */
-#include "utils.h"
+#include "utils.hh"
+
+#include <regex>
 
 namespace nalso {
-
 namespace utils {
-string removeMinus(string str) {
-  using namespace boost;
-  const regex s("(.*)-(.*)");
-  while (regex_match(str, s))
-    str = regex_replace(str, s, "\\1_\\2",
-                        boost::match_default | boost::format_sed);
+std::string removeMinus(std::string str) {
+  const std::regex s("(.*)-(.*)");
+  while (std::regex_match(str, s)) {
+    str = std::regex_replace(
+      str, s, "\\1_\\2",
+      std::regex_constants::match_default | std::regex_constants::format_sed
+    );
+  }
   return str;
 }
 }  // namespace utils

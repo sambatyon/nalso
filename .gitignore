@@ -1,2 +1,4 @@
 Debug/
 html/*
+bazel-*
+*.bazel.lock

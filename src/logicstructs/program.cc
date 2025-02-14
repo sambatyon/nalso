@@ -5,9 +5,9 @@
  *      Author: Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "program.h"
+#include "program.hh"
 
-#include <utils/utils.h>
+#include <utils/utils.hh>
 
 namespace nalso {
 

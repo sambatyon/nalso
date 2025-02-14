@@ -15,11 +15,10 @@
  *  @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef PROGRAM_H_
-#define PROGRAM_H_
+#pragma once
 
-#include <boost/shared_ptr.hpp>
 #include <list>
+#include <memory>
 #include <set>
 #include <string>
 /**
@@ -38,8 +37,6 @@ namespace nalso {
  * logic programming program.
  */
 namespace logicStructs {
-using namespace std;
-using namespace boost;
 
 /**
  * @brief Represents an variable in a logic program.
@@ -53,7 +50,7 @@ using namespace boost;
  */
 class BoolVar {
  private:
-  string name; /**< Name of the propositional variable.*/
+  std::string name; /**< Name of the propositional variable.*/
  public:
   /**
    * Clones the variable passed as a reference such that *this == at and this !=
@@ -67,7 +64,7 @@ class BoolVar {
    *
    * @param _name The name of the newly create variable.
    */
-  BoolVar(string _name) : name(_name) {}
+  BoolVar(std::string _name) : name(_name) {}
   /**
    * Creates a boolean variable with the given name.
    *
@@ -111,7 +108,7 @@ class BoolVar {
    *
    * @return a reference to this.
    */
-  BoolVar& operator=(const string _name) {
+  BoolVar& operator=(const std::string _name) {
     name = _name;
     return *this;
   }
@@ -156,7 +153,7 @@ class BoolVar {
    *
    * @param _name a new name for the object.
    */
-  void setName(const string _name) { name = _name; }
+  void setName(const std::string _name) { name = _name; }
 
   /**
    * Setter for the name property.
@@ -171,11 +168,11 @@ class BoolVar {
    *
    * @return name property.
    */
-  string getName() { return name; }
+  std::string getName() { return name; }
 };
 /// A shared pointer to an variable object
 /// @see nalso::logicStructs::BoolVar
-typedef shared_ptr<BoolVar> BoolVarPtr;
+typedef std::shared_ptr<BoolVar> BoolVarPtr;
 
 /**
  * @brief Abstract representation of a prepositional logic literal.
@@ -187,7 +184,7 @@ typedef shared_ptr<BoolVar> BoolVarPtr;
  */
 class Literal {
  private:
-  shared_ptr<Literal> complement;
+  std::shared_ptr<Literal> complement;
   BoolVarPtr var;
   bool negated;
 
@@ -238,7 +235,7 @@ class Literal {
    * @param _var the name of the var attribute of the new object.
    * @param _negated true if this object is a negative literal, false otherwise.
    */
-  Literal(string _var, bool _negated = false) : negated(_negated) {
+  Literal(std::string _var, bool _negated = false) : negated(_negated) {
     var.reset(new BoolVar(_var));
   }
 
@@ -269,11 +266,11 @@ class Literal {
   void setNegated(bool _negated) { negated = _negated; }
 
   /// returns the string representation of this literal
-  operator string();
+  operator std::string();
   /// Returns a copy of var object.
   operator BoolVar();
   /// Returns a pointer to the var object.
-  operator shared_ptr<BoolVar>();
+  operator std::shared_ptr<BoolVar>();
 
   /**
    * Copies the values of other into this, such that *this == other but this !=
@@ -319,7 +316,7 @@ class Literal {
    *
    * @return a reference to this object.
    */
-  Literal& operator=(const string& other) {
+  Literal& operator=(const std::string& other) {
     var.reset(new BoolVar(other));
     negated = false;
     return *this;
@@ -385,12 +382,12 @@ class Literal {
    */
   bool operator!=(const BoolVar& other) { return !(*this == other); }
 
-  shared_ptr<Literal> getComplement() { return complement; };
-  void setComplement(shared_ptr<Literal> com) { complement = com; };
+  std::shared_ptr<Literal> getComplement() { return complement; };
+  void setComplement(std::shared_ptr<Literal> com) { complement = com; };
 };
 /// A pointer to a literal
 /// @see Literal
-typedef shared_ptr<Literal> LiteralPtr;
+typedef std::shared_ptr<Literal> LiteralPtr;
 
 /**
  * @brief Representation of a clause.
@@ -405,7 +402,7 @@ class Clause {
  private:
   BoolVarPtr head; /*< The atom in the head of the clause, only positive atoms
                       are allowed */
-  set<LiteralPtr> body;
+  std::set<LiteralPtr> body;
 
  public:
   /**
@@ -426,7 +423,7 @@ class Clause {
    *
    * @return A reference to the set containing the literals in the body.
    */
-  set<LiteralPtr>& getBody() { return body; }
+  std::set<LiteralPtr>& getBody() { return body; }
 
   /**
    * Cleans the attribute body and puts all the elements of _body into body
@@ -435,7 +432,7 @@ class Clause {
    * @param _body A set of pointers to literals which will be used as the
    * elements of the body in this clause.
    */
-  void setBody(set<LiteralPtr>& _body);
+  void setBody(std::set<LiteralPtr>& _body);
 
   /**
    * Checks whether the given atom appears in the body of the clause without
@@ -477,7 +474,7 @@ class Clause {
    * clause, p_1 to p_k are the positive literals in the clause and p_k+1 to p_n
    * the negative literals.
    */
-  operator string();
+  operator std::string();
   /**
    * Checks for the equality of two clauses. Two clauses are said to be equal if
    * the two heads are valued equal and all the literals in the bodies are
@@ -513,11 +510,11 @@ class Clause {
    * @return a set containing pointers to the boolean variables in the literals
    * of the body.
    */
-  set<BoolVarPtr> getAllBoolVars();
+  std::set<BoolVarPtr> getAllBoolVars();
 };
 /// A pointer to a clause
 /// @see Clause
-typedef shared_ptr<Clause> ClausePtr;
+typedef std::shared_ptr<Clause> ClausePtr;
 
 /**
  * @brief represents a set of values that cannot be true at the same time. i.e.
@@ -528,7 +525,7 @@ typedef shared_ptr<Clause> ClausePtr;
  */
 class Constraint {
  private:
-  set<BoolVarPtr> body;
+  std::set<BoolVarPtr> body;
 
  public:
   /**
@@ -536,7 +533,7 @@ class Constraint {
    *
    * @return A reference to the body of the constraint.
    */
-  set<BoolVarPtr>& getBody() { return body; }
+  std::set<BoolVarPtr>& getBody() { return body; }
   /**
    * The setter of the body attribute. It initializes the body with a copy of
    * the _body parameter, set will contain pointers to the same elements as
@@ -544,7 +541,7 @@ class Constraint {
    *
    * @param _body a set of boolvar pointers that will be cloned.
    */
-  void setBody(set<BoolVarPtr>& _body);
+  void setBody(std::set<BoolVarPtr>& _body);
 
   /**
    * Generates a string representation of a constraint to be used as an
@@ -553,7 +550,7 @@ class Constraint {
    *
    * @see Clause#operator string()
    */
-  operator string();
+  operator std::string();
   /**
    * Two constraints are considered equal if their bodies contain the same
    * propositional variables ie. each propositional varaible in this an other
@@ -592,7 +589,7 @@ class Constraint {
 };
 
 /// A pointer to a constraint
-typedef shared_ptr<Constraint> ConstraintPtr;
+typedef std::shared_ptr<Constraint> ConstraintPtr;
 
 /**
  * @brief Abstract representation of a full propositional abductive logic
@@ -608,10 +605,10 @@ typedef shared_ptr<Constraint> ConstraintPtr;
  */
 class Program {
  private:
-  set<ClausePtr> clauses;
-  set<BoolVarPtr> obsers;
-  set<BoolVarPtr> abducts;
-  set<ConstraintPtr> consts;
+  std::set<ClausePtr> clauses;
+  std::set<BoolVarPtr> obsers;
+  std::set<BoolVarPtr> abducts;
+  std::set<ConstraintPtr> consts;
 
  public:
   Program();
@@ -622,58 +619,58 @@ class Program {
    *
    * @return A reference to the clauses attribute.
    */
-  set<ClausePtr>& getClauses() { return clauses; }
+  std::set<ClausePtr>& getClauses() { return clauses; }
   /**
    * Setter method for the clauses attribute.
    *
    * @param _clauses A set of clauses to be cloned.
    */
-  void setClauses(set<ClausePtr>& _clauses);
+  void setClauses(std::set<ClausePtr>& _clauses);
 
   /**
    * Getter method of the obsers attribute.
    *
    * @return A reference to the clauses obsers.
    */
-  set<BoolVarPtr>& getObsers() { return obsers; }
+  std::set<BoolVarPtr>& getObsers() { return obsers; }
   /**
    * Setter method for the obsers attribute.
    *
    * @param _obsers A set of obsers to be cloned.
    */
-  void setObsers(set<BoolVarPtr>& _obsers);
+  void setObsers(std::set<BoolVarPtr>& _obsers);
 
   /**
    * Getter method of the abducts attribute.
    *
    * @return A reference to the clauses abducts.
    */
-  set<BoolVarPtr>& getAbducts() { return abducts; }
+  std::set<BoolVarPtr>& getAbducts() { return abducts; }
   /**
    * Setter method for the abducts attribute.
    *
    * @param _abducts A set of abducts to be cloned.
    */
-  void setAbducst(set<BoolVarPtr>& _abducts);
+  void setAbducst(std::set<BoolVarPtr>& _abducts);
 
   /**
    * Getter method of the consts attribute.
    *
    * @return A reference to the clauses consts.
    */
-  set<ConstraintPtr>& getConstraints() { return consts; }
+  std::set<ConstraintPtr>& getConstraints() { return consts; }
   /**
    * Setter method for the consts attribute.
    *
    * @param _consts A set of consts to be cloned.
    */
-  void setConstraints(set<ConstraintPtr>& _consts);
+  void setConstraints(std::set<ConstraintPtr>& _consts);
 
   /**
    * Generates the string representation of the program which can be parsed by
    * the default parser.
    */
-  operator string();
+  operator std::string();
 
   /**
    * Return all the different atoms declared in a program. i.e. All the
@@ -682,7 +679,7 @@ class Program {
    *
    * @return a set with pointers to all the atoms used by a program.
    */
-  set<BoolVarPtr> allPropositionalVariables();
+  std::set<BoolVarPtr> allPropositionalVariables();
   /**
    * Return a set containing all the atoms used in the clauses of a program.
    * Useful to check the well definition of a program, since the set of
@@ -692,7 +689,7 @@ class Program {
    * @return a set with pointers to all the atoms declared in the clauses set of
    * the program.
    */
-  set<BoolVarPtr> clausesPropositionalVariables();
+  std::set<BoolVarPtr> clausesPropositionalVariables();
   /**
    * Return a set containing all the atoms used in the constrains of a program.
    * Useful to check the well definition of a program, since the set of
@@ -702,7 +699,7 @@ class Program {
    * @return a set with pointers to all the atoms declared in the clauses set of
    * the program.
    */
-  set<BoolVarPtr> constrainsPropositionalVariables();
+  std::set<BoolVarPtr> constrainsPropositionalVariables();
 
   /**
    * When no abductibles are passed in the program file, they can still be
@@ -727,10 +724,8 @@ class Program {
 
 /// A pointer to a Program
 /// @see Program
-typedef shared_ptr<Program> ProgramPtr;
+typedef std::shared_ptr<Program> ProgramPtr;
 
 }  // namespace logicStructs
 
 }  // namespace nalso
-
-#endif /* PROGRAM_H_ */
