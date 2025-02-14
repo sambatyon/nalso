@@ -1,0 +1,24 @@
+digraph hopfield{
+	node [shape=plaintext, fontsize=10];
+	edge [arrowhead=none];
+	{
+		rank=same;
+		w0-p;
+		w0-q;
+	}
+	{
+		rank=same;
+		w0-pxq;
+	}
+	pxq->w0-pxq;
+	h0->pxq;
+	p->h0;
+	w0-p->p;
+	q->h0;
+	w0-q->q;
+	h1->pxq;
+	p->h1;
+	w0-p->p;
+	q->h1;
+	w0-q->q;
+}
