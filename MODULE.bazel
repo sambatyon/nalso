@@ -1,1 +1,3 @@
 module(name="naslo", version = "0.0.1")
+
+bazel_dep(name = "boost.spirit", version = "1.83.0.bcr.2")

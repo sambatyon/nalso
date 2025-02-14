@@ -9,19 +9,15 @@
  *  @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef SPLPARSER_H_
-#define SPLPARSER_H_
+#pragma once
 
 #include <iostream>
 
-#include "alparser.hh"
+#include "nalso/parsers/alparser.hh"
 
 namespace nalso {
 
 namespace parsers {
-using namespace std;
-using namespace logicStructs;
-
 /**
  * @brief small prolog parser class.
  *
@@ -43,7 +39,7 @@ using namespace logicStructs;
  */
 class SmallPrologParser : AbductLogicProgramParser {
  public:
-  SmallPrologParser(istream& _source = cin)
+  SmallPrologParser(std::istream& _source = std::cin)
       : AbductLogicProgramParser(_source) {};
   virtual ~SmallPrologParser() {};
 
@@ -56,11 +52,8 @@ class SmallPrologParser : AbductLogicProgramParser {
    *
    * @see AbductLogicProgramParser#parse()
    */
-  ProgramPtr parseProgram();
+  logicStructs::ProgramPtr parseProgram();
 };
 
 }  // namespace parsers
-
 }  // namespace nalso
-
-#endif /* SPLPARSER_H_ */

@@ -19,7 +19,6 @@
 #endif
 
 int main(int args, char** argv) {
-  std::cout << "Hello world" << std::endl;
 #ifdef DEBUG
   CppUnit::TextUi::TestRunner runner;
   runner.addTest(test::TestLogicStruct::suite());

@@ -10,14 +10,13 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef ALPARSER_H_
-#define ALPARSER_H_
+#pragma once
 
 #include <iostream>
 #include <string>
 
-#include "logicstructs/program.hh"
-#include "utils/utils.hh"
+#include "nalso/logicstructs/program.hh"
+#include "nalso/utils/utils.hh"
 
 namespace nalso {
 /**
@@ -28,8 +27,7 @@ namespace nalso {
  * AbductLogicProgramParser
  */
 namespace parsers {
-using namespace std;
-using namespace logicStructs;
+namespace logStr = logicStructs;
 /**
  * @brief Abstract class which works as parent of all classes that intend to
  * parse A.L. programs.
@@ -42,7 +40,7 @@ using namespace logicStructs;
  */
 class AbductLogicProgramParser {
  protected:
-  istream &source;
+  std::istream &source;
   /**
    * Checks whether the program is consistent. For a program to be consistent
    * the observations and abdcutibles sets need to be disjunct and the
@@ -55,7 +53,7 @@ class AbductLogicProgramParser {
    *
    * @return true if the program is inconsitent, false otherwise.
    */
-  static bool check(Program &pr, string &message);
+  static bool check(logStr::Program &pr, std::string &message);
 
  public:
   /**
@@ -63,8 +61,8 @@ class AbductLogicProgramParser {
    *
    * @param _source The input stream containing the data to be parsed.
    */
-  AbductLogicProgramParser(istream &_source = cin) : source(_source) {};
-  virtual ~AbductLogicProgramParser() {};
+  AbductLogicProgramParser(std::istream &_source = std::cin) : source(_source) {}
+  virtual ~AbductLogicProgramParser() {}
 
   /**
    * Virtual function that performs the actual parsing. It should be override by
@@ -72,11 +70,8 @@ class AbductLogicProgramParser {
    *
    * @return A pointer to a Program object that represents the parsed stream.
    */
-  virtual ProgramPtr parseProgram() = 0;
+  virtual logStr::ProgramPtr parseProgram() = 0;
 };
 
 }  // namespace parsers
-
 }  // namespace nalso
-
-#endif /* ALPARSER_H_ */
