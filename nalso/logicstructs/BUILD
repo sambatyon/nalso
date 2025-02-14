@@ -1,6 +1,6 @@
 cc_library(
   name = "logicstructs",
-  deps = ["//src/utils"],
+  deps = ["//nalso/utils"],
   srcs = ["program.cc"],
   hdrs = ["program.hh"],
 )

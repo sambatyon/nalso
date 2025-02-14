@@ -37,10 +37,12 @@ namespace utils {
  * @return true if the set list_ contains an element that computes to equal (by
  * value) the the one passed as a reference, false otherwise.
  */
-template <typename T, class InputIterator>
-bool isInSet(std::set<std::shared_ptr<T> > &list_, T &elem, InputIterator it) {
-  it = list_.begin();
-  while (it != list_.end() && elem != **it) it++;
+template <typename T>
+bool isInSet(std::set<std::shared_ptr<T> > &list_, T &elem) {
+  auto it = list_.begin();
+  while (it != list_.end() && elem != **it) {
+    it++;
+  }
   return it == list_.end() ? false : true;
 }
 
