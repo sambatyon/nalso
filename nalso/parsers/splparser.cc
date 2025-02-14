@@ -7,7 +7,7 @@
 
 #include "splparser.hh"
 
-#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/classic.hpp>
 #include <list>
 #include <map>
 #include <memory>
@@ -18,34 +18,34 @@ namespace nalso {
 
 namespace parsers {
 
-using namespace boost::spirit::qi;
+namespace spirit = boost::spirit::classic;
 
 namespace smallProlog {
 namespace logStr = logicStructs;
 
 //  Here's our comment rule
-struct skip_grammar : public grammar<skip_grammar> {
+struct skip_grammar : public spirit::grammar<skip_grammar> {
   template <typename ScannerT>
   struct definition {
     definition(skip_grammar const& /*self*/) {
-      skip = space_p | comment_p("%");
+      skip = spirit::space_p | spirit::comment_p("%");
     }
 
-    rule<ScannerT> skip;
+    spirit::rule<ScannerT> skip;
 
-    rule<ScannerT> const& start() const { return skip; }
+    spirit::rule<ScannerT> const& start() const { return skip; }
   };
 };
 
 logStr::BoolVarPtr currentVar;
-std::list<BoolVarPtr> currentVarSet;
+std::list<logStr::BoolVarPtr> currentVarSet;
 logStr::LiteralPtr currentPosLit, currentNegLit;
-std::set<LiteralPtr> currentLiteralSet;
-logStr::ClausePtr currentClause(new Clause);
-logStr::ConstraintPtr currentConstraint(new Constraint);
+std::set<logStr::LiteralPtr> currentLiteralSet;
+logStr::ClausePtr currentClause(new logStr::Clause());
+logStr::ConstraintPtr currentConstraint(new logStr::Constraint());
 
 std::map<std::string, logStr::BoolVarPtr> varSet;
-std::map<std::string, std::pair<logStr::LiteralPtr, LlogStr::iteralPtr> > literalSet;
+std::map<std::string, std::pair<logStr::LiteralPtr, logStr::LiteralPtr> > literalSet;
 
 std::set<logStr::ClausePtr> clauses;
 std::set<logStr::BoolVarPtr> observations, abductibles;
@@ -55,7 +55,7 @@ void read_atom(std::vector<char>::const_iterator first,
                std::vector<char>::const_iterator last) {
   std::string name = std::string(first, last);
   // check if this variable was already parsed
-  if (varSet.find(name) == varSet.end()) {
+  if (varSet.find(name) == std::end(varSet)) {
     // if it was not parse, we create a new one and add it to our list
     currentVar.reset(new logStr::BoolVar(name));
     varSet[name] = currentVar;
@@ -77,8 +77,8 @@ void read_pos_literal(std::vector<char>::const_iterator first,
   // we check whether the literals based on the current var were already created
   if (literalSet.find((*boolVar).getName()) == std::end(literalSet)) {
     // if they weren't we create them
-    currentPosLit.reset(new Literal(boolVar));
-    currentNegLit.reset(new Literal(boolVar, true));
+    currentPosLit.reset(new logStr::Literal(boolVar));
+    currentNegLit.reset(new logStr::Literal(boolVar, true));
 
     currentPosLit->setComplement(currentNegLit);
     currentNegLit->setComplement(currentPosLit);
@@ -104,8 +104,8 @@ void read_neg_literal(std::vector<char>::const_iterator first,
   // we check whether the literals based on the current var were already created
   if (literalSet.find((*boolVar).getName()) == literalSet.end()) {
     // if they weren't we create them
-    currentPosLit.reset(new Literal(boolVar));
-    currentNegLit.reset(new Literal(boolVar, true));
+    currentPosLit.reset(new logStr::Literal(boolVar));
+    currentNegLit.reset(new logStr::Literal(boolVar, true));
 
     currentPosLit->setComplement(currentNegLit);
     currentNegLit->setComplement(currentPosLit);
@@ -114,8 +114,9 @@ void read_neg_literal(std::vector<char>::const_iterator first,
     literalSet[(*boolVar).getName()] = make_pair(currentPosLit, currentNegLit);
   } else {
     // if they we created we update the current literal
-    currentPosLit = literalSet[(*boolVar).getName()].first;
-    currentNegLit = literalSet[(*boolVar).getName()].second;
+    auto [pos, neg] = literalSet[(*boolVar).getName()];
+    currentPosLit = pos;
+    currentNegLit = neg;
   }
   // and finaly add the current positive literal to the body of the current
   // class.
@@ -131,7 +132,7 @@ void read_clause_head(std::vector<char>::const_iterator first,
 void read_clause(std::vector<char>::const_iterator first,
                  std::vector<char>::const_iterator last) {
   clauses.insert(currentClause);
-  currentClause.reset(new Clause());
+  currentClause.reset(new logStr::Clause());
 }
 
 void read_fact(std::vector<char>::const_iterator first,
@@ -139,35 +140,41 @@ void read_fact(std::vector<char>::const_iterator first,
   observations.insert(currentVarSet.front());
   currentVarSet.clear();
 }
-std::
+
 void read_abduct(std::vector<char>::const_iterator first,
                  std::vector<char>::const_iterator last) {
-  for (std::list<BoolVarPtr>::iterator it = currentVarSet.begin();
-       it != currentVarSet.end(); it++)
+  for (auto it = currentVarSet.begin(); it != currentVarSet.end(); it++) {
     abductibles.insert(*it);
+  }
   currentVarSet.clear();
 }
 
 void read_const(std::vector<char>::const_iterator first,
                 std::vector<char>::const_iterator last) {
   if (currentVarSet.size() > 0) {
-    for (std::list<BoolVarPtr>::iterator it = currentVarSet.begin();
-         it != currentVarSet.end(); it++)
+    for (auto it = currentVarSet.begin(); it != currentVarSet.end(); it++) {
       (*currentConstraint).getBody().insert(*it);
+    }
 
     constraints.insert(currentConstraint);
-    currentConstraint.reset(new Constraint);
+    currentConstraint.reset(new logStr::Constraint);
     currentVarSet.clear();
   }
 }
 
 // This is the grammar definition of my prolog language
-struct small_prolog_grammar : public grammar<small_prolog_grammar> {
+struct small_prolog_grammar : public spirit::grammar<small_prolog_grammar> {
   template <typename ScannerT>
   struct definition {
     definition(small_prolog_grammar const& /*self*/) {
-      atom = (lexeme_d[(alpha_p | ch_p('_')) >>
-                       *(alnum_p | ch_p('_') | ch_p('-'))])[&read_atom];
+      using spirit::alnum_p;
+      using spirit::alpha_p;
+      using spirit::ch_p;
+      using spirit::epsilon_p;
+      using spirit::str_p;
+      atom = (
+        spirit::lexeme_d[(alpha_p | ch_p('_')) >> *(alnum_p | ch_p('_') | ch_p('-'))]
+      )[&read_atom];
       literal =
           (atom[&read_pos_literal] | str_p("¬") >> atom[&read_neg_literal]);
       atom_disy = (atom >> *(ch_p(',') >> atom) | epsilon_p);
@@ -180,10 +187,19 @@ struct small_prolog_grammar : public grammar<small_prolog_grammar> {
               constraint[&read_const]);
       program = +(expr);
     }
-    rule<ScannerT> atom, literal, atom_disy, lit_disy, fact, abduct, clause,
-        constraint, expr, program;
 
-    rule<ScannerT> const& start() const { return program; };
+    spirit::rule<ScannerT> atom;
+    spirit::rule<ScannerT> literal;
+    spirit::rule<ScannerT> atom_disy;
+    spirit::rule<ScannerT> lit_disy;
+    spirit::rule<ScannerT> fact;
+    spirit::rule<ScannerT> abduct;
+    spirit::rule<ScannerT> clause;
+    spirit::rule<ScannerT> constraint;
+    spirit::rule<ScannerT> expr;
+    spirit::rule<ScannerT> program;
+
+    spirit::rule<ScannerT> const& start() const { return program; };
   };
 };
 
@@ -194,8 +210,11 @@ logStr::ProgramPtr SmallPrologParser::parseProgram() {
 
   std::vector<char> vec;
   // copy the contents of the file into vec
-  std::copy(istream_iterator<char>(source), istream_iterator<char>(),
-            std::back_inserter(vec));
+  std::copy(
+    std::istream_iterator<char>(source),
+    std::istream_iterator<char>(),
+    std::back_inserter(vec)
+  );
 
   // we get the iterators to begin and end
   std::vector<char>::const_iterator start = std::begin(vec);
@@ -203,31 +222,32 @@ logStr::ProgramPtr SmallPrologParser::parseProgram() {
 
   // instantiate the skip rule
   smallProlog::skip_grammar skip;
-
   smallProlog::small_prolog_grammar g;
 
   // perform the parsing
-  parse_info<std::vector<char>::const_iterator> result = parse(start, end, g, skip);
+  parse(start, end, g, skip);
+
+  namespace sprlg = smallProlog;
 
   logStr::ProgramPtr res(new logStr::Program);
-  for (auto clIt = smallProlog::clauses.begin(); clIt != smallProlog::clauses.end(); clIt++)
-    (*res).getClauses().insert(*clIt);
+  for (auto it = sprlg::clauses.begin(); it != sprlg::clauses.end(); it++) {
+    (*res).getClauses().insert(*it);
+  }
 
-  std::set<BoolVarPtr>::iterator boolVarIt;
-  for (boolVarIt = smallProlog::observations.begin();
-       boolVarIt != smallProlog::observations.end(); boolVarIt++)
-    (*res).getObsers().insert(*boolVarIt);
+  for (auto it = sprlg::observations.begin(); it != sprlg::observations.end(); it++) {
+    (*res).getObsers().insert(*it);
+  }
 
-  for (boolVarIt = smallProlog::abductibles.begin();
-       boolVarIt != smallProlog::abductibles.end(); boolVarIt++)
-    (*res).getAbducts().insert(*boolVarIt);
+  for (auto it = sprlg::abductibles.begin();
+       it != sprlg::abductibles.end(); it++) {
+    (*res).getAbducts().insert(*it);
+  }
 
-  for (set<ConstraintPtr>::iterator coIt = smallProlog::constraints.begin();
-       coIt != smallProlog::constraints.end(); coIt++)
-    (*res).getConstraints().insert(*coIt);
+  for (auto it = sprlg::constraints.begin();it != sprlg::constraints.end(); it++) {
+    (*res).getConstraints().insert(*it);
+  }
 
   return res;
 }
 }  // namespace parsers
-
 }  // namespace nalso
