@@ -15,10 +15,10 @@ namespace nalso {
 
 namespace parsers {
 
-bool AbductLogicProgramParser::check(logicStructs::Program& pr, std::string& message) {
-  std::set<logicStructs::BoolVarPtr> obs = pr.getObsers();
-  std::set<logicStructs::BoolVarPtr> abd = pr.getAbducts();
-  std::set<logicStructs::BoolVarPtr> cls = pr.clausesPropositionalVariables();
+bool AbductLogicProgramParser::check(logic::Program& pr, std::string& message) {
+  std::set<logic::BoolVarPtr> obs = pr.getObsers();
+  std::set<logic::BoolVarPtr> abd = pr.getAbducts();
+  std::set<logic::BoolVarPtr> cls = pr.clausesPropositionalVariables();
 
   for (auto it = obs.begin(); it != obs.end(); it++)
     if (utils::contains(abd, **it)) {

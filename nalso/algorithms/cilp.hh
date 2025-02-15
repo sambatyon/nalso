@@ -45,7 +45,7 @@ class Cilp : public NNBuilderAlgo {
    * @param[out] mus an array containing the number of clauses for each head in
    * the program. only contains values greather than zero
    */
-  static void computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
+  static void computeParams(std::set<logic::ClausePtr>& clauses, double& amin, double& w,
                             double beta, std::map<std::string, int>& mus);
   /**
    * Compute the parameters needed by the CiLP algorithm.
@@ -60,18 +60,18 @@ class Cilp : public NNBuilderAlgo {
    * @param[in] beta The beta value of the activation function of the nodes.
    *
    */
-  static void computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
+  static void computeParams(std::set<logic::ClausePtr>& clauses, double& amin, double& w,
                             double beta);
 
-  static std::set<logicStructs::BoolVarPtr> getAtoms(std::set<logicStructs::ClausePtr>& cls);
+  static std::set<logic::BoolVarPtr> getAtoms(std::set<logic::ClausePtr>& cls);
 
  public:
   Cilp(double _beta = 1, double _amin = NAN)
       : beta(_beta), amin(_amin), w(NAN) {};
   virtual ~Cilp();
 
-  virtual neural::NeuralNetworkPtr buildNetwork(logicStructs::ProgramPtr pr);
-  virtual neural::NeuralNetworkPtr buildNetwork(std::set<logicStructs::ClausePtr> pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(logic::ProgramPtr pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(std::set<logic::ClausePtr> pr);
 };
 
 }  // namespace algorithms

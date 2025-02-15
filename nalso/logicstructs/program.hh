@@ -35,7 +35,7 @@ namespace nalso {
  * It is a container for all the structures needed to represent an abductive
  * logic programming program.
  */
-namespace logicStructs {
+namespace logic {
 
 /**
  * @brief Represents an variable in a logic program.

@@ -21,7 +21,6 @@ namespace parsers {
 namespace spirit = boost::spirit::classic;
 
 namespace smallProlog {
-namespace logStr = logicStructs;
 
 //  Here's our comment rule
 struct skip_grammar : public spirit::grammar<skip_grammar> {
@@ -37,19 +36,19 @@ struct skip_grammar : public spirit::grammar<skip_grammar> {
   };
 };
 
-logStr::BoolVarPtr currentVar;
-std::list<logStr::BoolVarPtr> currentVarSet;
-logStr::LiteralPtr currentPosLit, currentNegLit;
-std::set<logStr::LiteralPtr> currentLiteralSet;
-logStr::ClausePtr currentClause(new logStr::Clause());
-logStr::ConstraintPtr currentConstraint(new logStr::Constraint());
+logic::BoolVarPtr currentVar;
+std::list<logic::BoolVarPtr> currentVarSet;
+logic::LiteralPtr currentPosLit, currentNegLit;
+std::set<logic::LiteralPtr> currentLiteralSet;
+logic::ClausePtr currentClause(new logic::Clause());
+logic::ConstraintPtr currentConstraint(new logic::Constraint());
 
-std::map<std::string, logStr::BoolVarPtr> varSet;
-std::map<std::string, std::pair<logStr::LiteralPtr, logStr::LiteralPtr> > literalSet;
+std::map<std::string, logic::BoolVarPtr> varSet;
+std::map<std::string, std::pair<logic::LiteralPtr, logic::LiteralPtr> > literalSet;
 
-std::set<logStr::ClausePtr> clauses;
-std::set<logStr::BoolVarPtr> observations, abductibles;
-std::set<logStr::ConstraintPtr> constraints;
+std::set<logic::ClausePtr> clauses;
+std::set<logic::BoolVarPtr> observations, abductibles;
+std::set<logic::ConstraintPtr> constraints;
 
 void read_atom(std::vector<char>::const_iterator first,
                std::vector<char>::const_iterator last) {
@@ -57,7 +56,7 @@ void read_atom(std::vector<char>::const_iterator first,
   // check if this variable was already parsed
   if (varSet.find(name) == std::end(varSet)) {
     // if it was not parse, we create a new one and add it to our list
-    currentVar.reset(new logStr::BoolVar(name));
+    currentVar.reset(new logic::BoolVar(name));
     varSet[name] = currentVar;
   } else {
     // if it was created we set the current var pointer to the already defined
@@ -72,13 +71,13 @@ void read_pos_literal(std::vector<char>::const_iterator first,
                       std::vector<char>::const_iterator last) {
   // we get the first element of the current var set, which is the latest parse
   // boolVar
-  logStr::BoolVarPtr boolVar = currentVarSet.front();
+  logic::BoolVarPtr boolVar = currentVarSet.front();
 
   // we check whether the literals based on the current var were already created
   if (literalSet.find((*boolVar).getName()) == std::end(literalSet)) {
     // if they weren't we create them
-    currentPosLit.reset(new logStr::Literal(boolVar));
-    currentNegLit.reset(new logStr::Literal(boolVar, true));
+    currentPosLit.reset(new logic::Literal(boolVar));
+    currentNegLit.reset(new logic::Literal(boolVar, true));
 
     currentPosLit->setComplement(currentNegLit);
     currentNegLit->setComplement(currentPosLit);
@@ -99,13 +98,13 @@ void read_neg_literal(std::vector<char>::const_iterator first,
                       std::vector<char>::const_iterator last) {
   // we get the first element of the current var set, which is the latest parse
   // boolVar
-  logStr::BoolVarPtr boolVar = currentVarSet.front();
+  logic::BoolVarPtr boolVar = currentVarSet.front();
 
   // we check whether the literals based on the current var were already created
   if (literalSet.find((*boolVar).getName()) == literalSet.end()) {
     // if they weren't we create them
-    currentPosLit.reset(new logStr::Literal(boolVar));
-    currentNegLit.reset(new logStr::Literal(boolVar, true));
+    currentPosLit.reset(new logic::Literal(boolVar));
+    currentNegLit.reset(new logic::Literal(boolVar, true));
 
     currentPosLit->setComplement(currentNegLit);
     currentNegLit->setComplement(currentPosLit);
@@ -132,7 +131,7 @@ void read_clause_head(std::vector<char>::const_iterator first,
 void read_clause(std::vector<char>::const_iterator first,
                  std::vector<char>::const_iterator last) {
   clauses.insert(currentClause);
-  currentClause.reset(new logStr::Clause());
+  currentClause.reset(new logic::Clause());
 }
 
 void read_fact(std::vector<char>::const_iterator first,
@@ -157,7 +156,7 @@ void read_const(std::vector<char>::const_iterator first,
     }
 
     constraints.insert(currentConstraint);
-    currentConstraint.reset(new logStr::Constraint);
+    currentConstraint.reset(new logic::Constraint);
     currentVarSet.clear();
   }
 }
@@ -205,7 +204,7 @@ struct small_prolog_grammar : public spirit::grammar<small_prolog_grammar> {
 
 }  // namespace smallProlog
 
-logStr::ProgramPtr SmallPrologParser::parseProgram() {
+logic::ProgramPtr SmallPrologParser::parseProgram() {
   source.unsetf(std::ios::skipws);
 
   std::vector<char> vec;
@@ -229,7 +228,7 @@ logStr::ProgramPtr SmallPrologParser::parseProgram() {
 
   namespace sprlg = smallProlog;
 
-  logStr::ProgramPtr res(new logStr::Program);
+  logic::ProgramPtr res(new logic::Program);
   for (auto it = sprlg::clauses.begin(); it != sprlg::clauses.end(); it++) {
     (*res).getClauses().insert(*it);
   }

@@ -17,7 +17,7 @@ namespace algorithms {
 
 Cilp::~Cilp() {}
 
-void Cilp::computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
+void Cilp::computeParams(std::set<logic::ClausePtr>& clauses, double& amin, double& w,
                          double beta, std::map<std::string, int>& mus) {
   std::vector<int> ks;
 
@@ -54,14 +54,14 @@ void Cilp::computeParams(std::set<logicStructs::ClausePtr>& clauses, double& ami
       ((log(1 + amin) - log(1 - amin)) / (maxksmus * (amin - 1) + amin + 1));
 }
 
-void Cilp::computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
+void Cilp::computeParams(std::set<logic::ClausePtr>& clauses, double& amin, double& w,
                          double beta) {
   std::map<std::string, int> mus;
   computeParams(clauses, amin, w, beta, mus);
 }
 
-std::set<logicStructs::BoolVarPtr> Cilp::getAtoms(std::set<logicStructs::ClausePtr>& cls) {
-  std::set<logicStructs::BoolVarPtr> res;
+std::set<logic::BoolVarPtr> Cilp::getAtoms(std::set<logic::ClausePtr>& cls) {
+  std::set<logic::BoolVarPtr> res;
   // now we add all the clauses atoms if they're not already in the list
   for (auto clIt = cls.begin(); clIt != cls.end(); clIt++) {
     // first we check the head.
@@ -80,11 +80,11 @@ std::set<logicStructs::BoolVarPtr> Cilp::getAtoms(std::set<logicStructs::ClauseP
   return res;
 }
 
-neural::NeuralNetworkPtr Cilp::buildNetwork(logicStructs::ProgramPtr pr) {
+neural::NeuralNetworkPtr Cilp::buildNetwork(logic::ProgramPtr pr) {
   return buildNetwork(pr->getClauses());
 }
 
-neural::NeuralNetworkPtr Cilp::buildNetwork(std::set<logicStructs::ClausePtr> cls) {
+neural::NeuralNetworkPtr Cilp::buildNetwork(std::set<logic::ClausePtr> cls) {
   // we compute the parameters.
   std::map<std::string, int> mus;
   computeParams(cls, amin, w, beta, mus);
@@ -95,7 +95,7 @@ neural::NeuralNetworkPtr Cilp::buildNetwork(std::set<logicStructs::ClausePtr> cl
   neural::NeuralMethodPtr linear(new neural::LinearMethod);
   neural::NeuralMethodPtr bipolar(new neural::BipolarSemilinearMethod(beta));
 
-  std::set<logicStructs::BoolVarPtr> atoms = getAtoms(cls);
+  std::set<logic::BoolVarPtr> atoms = getAtoms(cls);
 
   // first we create an input and output unit for each variable that appears in
   // the program

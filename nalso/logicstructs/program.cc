@@ -10,7 +10,7 @@
 #include "nalso/utils/utils.hh"
 
 namespace nalso {
-namespace logicStructs {
+namespace logic {
 
 BoolVar& BoolVar::operator=(const BoolVar& other) {
   if (this != &other) {

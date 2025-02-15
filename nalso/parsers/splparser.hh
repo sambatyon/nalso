@@ -52,7 +52,7 @@ class SmallPrologParser : AbductLogicProgramParser {
    *
    * @see AbductLogicProgramParser#parse()
    */
-  logicStructs::ProgramPtr parseProgram();
+  logic::ProgramPtr parseProgram();
 };
 
 }  // namespace parsers

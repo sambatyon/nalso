@@ -22,8 +22,8 @@ namespace algorithms {
  */
 class NNBuilderAlgo {
  public:
-  virtual neural::NeuralNetworkPtr buildNetwork(logicStructs::ProgramPtr pr) = 0;
-  virtual neural::NeuralNetworkPtr buildNetwork(std::set<logicStructs::ClausePtr> pr) = 0;
+  virtual neural::NeuralNetworkPtr buildNetwork(logic::ProgramPtr pr) = 0;
+  virtual neural::NeuralNetworkPtr buildNetwork(std::set<logic::ClausePtr> pr) = 0;
 };
 
 }  // namespace algorithms

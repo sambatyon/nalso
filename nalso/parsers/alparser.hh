@@ -27,7 +27,6 @@ namespace nalso {
  * AbductLogicProgramParser
  */
 namespace parsers {
-namespace logStr = logicStructs;
 /**
  * @brief Abstract class which works as parent of all classes that intend to
  * parse A.L. programs.
@@ -53,7 +52,7 @@ class AbductLogicProgramParser {
    *
    * @return true if the program is inconsitent, false otherwise.
    */
-  static bool check(logStr::Program &pr, std::string &message);
+  static bool check(logic::Program &pr, std::string &message);
 
  public:
   /**
@@ -70,7 +69,7 @@ class AbductLogicProgramParser {
    *
    * @return A pointer to a Program object that represents the parsed stream.
    */
-  virtual logStr::ProgramPtr parseProgram() = 0;
+  virtual logic::ProgramPtr parseProgram() = 0;
 };
 
 }  // namespace parsers
