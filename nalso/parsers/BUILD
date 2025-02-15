@@ -10,7 +10,7 @@ cc_library(
     ],
   deps = [
     "//nalso/utils",
-    "//nalso/logicstructs:logic",
+    "//nalso/logic",
     "@boost.spirit",
     ],
   visibility = ["//visibility:public"],
