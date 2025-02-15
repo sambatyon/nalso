@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file ablogprog.h
  *
@@ -5,19 +6,14 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef ABLOGPROG_H_
-#define ABLOGPROG_H_
-
 #include <cmath>
 #include <map>
-#include <sstream>
 
-#include "cilp.hh"
+#include "nalso/algorithms/cilp.hh"
 
 namespace nalso {
 
 namespace algorithms {
-using namespace std;
 
 /**
  * @brief Implementation of the Abductive Logic Programming algorithm
@@ -32,7 +28,7 @@ using namespace std;
  */
 class AbLogProg : public Cilp {
  private:
-  map<string, pair<LiteralPtr, LiteralPtr> > generateAuxVars(ProgramPtr pr);
+  std::map<std::string, std::pair<logic::LiteralPtr, logic::LiteralPtr> > generateAuxVars(logic::ProgramPtr pr);
 
  protected:
   unsigned int clockSize;
@@ -52,12 +48,9 @@ class AbLogProg : public Cilp {
       : Cilp(_beta), clockSize(_clockSize) {};
   virtual ~AbLogProg() {};
 
-  virtual NeuralNetworkPtr buildNetwork(ProgramPtr pr);
-  virtual NeuralNetworkPtr buildNetwork(set<ClausePtr> pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(logic::ProgramPtr pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(std::set<logic::ClausePtr> pr);
 };
 
 }  // namespace algorithms
-
 }  // namespace nalso
-
-#endif /* ABLOGPROG_H_ */

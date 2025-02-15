@@ -10,8 +10,6 @@
 #include <ginac/ginac.h>
 
 #include <algorithm>
-#include <boost/regex.hpp>
-#include <boost/shared_ptr.hpp>
 #include <vector>
 
 namespace nalso {

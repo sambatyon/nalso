@@ -1,8 +1,14 @@
 cc_library(
   name = "algorithms",
-  srcs = ["cilp.cc"],
+  srcs = [
+    "ablogprog.cc",
+    "cilp.cc",
+    # "hohopfield.cc",
+  ],
   hdrs = [
+    "ablogprog.hh",
     "cilp.hh",
+    # "hohopfield.hh",
     "networkbuilder.hh",
     ],
   deps = [

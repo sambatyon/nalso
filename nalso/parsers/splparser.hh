@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file splparser.h
  *
@@ -8,8 +9,6 @@
  *  @date Oct 9, 2009
  *  @author Alexander Rojas <alexander.rojas@gmail.com>
  */
-
-#pragma once
 
 #include <iostream>
 

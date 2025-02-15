@@ -1,3 +1,4 @@
+#pragma once
 /*
  * @file hohopfield.h
  *
@@ -8,9 +9,6 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef HOHOPFIELD_H_
-#define HOHOPFIELD_H_
-
 #include <eclipsepl/eclipseclass.h>
 
 #include <list>
@@ -18,19 +16,17 @@
 #include <sstream>
 #include <string>
 
-#include "networkbuilder.hh"
-#include "networks/hopfield.hh"
+#include "nalso/algorithms/networkbuilder.hh"
+#include "nalso/neural/hopfield.hh"
 
 namespace nalso {
 
 namespace algorithms {
-using namespace std;
-using namespace boost;
 
 /** Provides a representation of a conjunction of literals */
-typedef set<LiteralPtr> Conjunction;
+typedef std::set<logic::LiteralPtr> Conjunction;
 /** Representation of a disjunction of conjunction of literals */
-typedef set<Conjunction> DisjunciveNormalForm;
+typedef std::set<logic::Conjunction> DisjunciveNormalForm;
 
 /** @brief Representation of a clause with ors involved
  *
@@ -49,14 +45,14 @@ class DisjunctionOfConjunctionsClause {
   friend class HighOrderHopfieldNetwork;
 
  private:
-  DisjunciveNormalForm body;
-  BoolVarPtr head;
-  map<string, LiteralPtr> allInTheClause;
+  logic::DisjunciveNormalForm body;
+  logic::BoolVarPtr head;
+  std::map<std::string, logic::LiteralPtr> allInTheClause;
 
  protected:
   // a map containing all the auxiliar variables used, in the value, first is
   // the a pointer to the consequent literal
-  static map<string, pair<LiteralPtr, LiteralPtr> > usedAuxLiterals;
+  static std::map<std::string, std::pair<logic::LiteralPtr, logic::LiteralPtr> > usedAuxLiterals;
   static unsigned int index;
 
  public:
@@ -65,7 +61,7 @@ class DisjunctionOfConjunctionsClause {
    *
    * @param _head The head of the clause.
    */
-  DisjunctionOfConjunctionsClause(BoolVarPtr _head) : head(_head) {}
+  DisjunctionOfConjunctionsClause(logic::BoolVarPtr _head) : head(_head) {}
 
   /**
    * Adds the elements of the body of the given clause in a disjunctive way to
@@ -79,13 +75,13 @@ class DisjunctionOfConjunctionsClause {
    * @return true if the body of cl was successfully added to this disjunctive
    * clause. false otherwise
    */
-  bool addConjunction(ClausePtr cl);
+  bool addConjunction(logic::ClausePtr cl);
   /**
    * Add the given literal as a new disjunctive element.
    *
    * @param l the literal to be added to the body of the clause
    */
-  void addConsequent(LiteralPtr l);
+  void addConsequent(logic::LiteralPtr l);
   /**
    * Adds the conjunction of literals as a new disjunction element to the body
    * of this clause. If there's a variable that appears in another conjunction
@@ -94,15 +90,14 @@ class DisjunctionOfConjunctionsClause {
    *
    * @param con the conjunction to be added to the body of the clause.
    */
-  void addConjunctionOfLiterals(Conjunction con);
+  void addConjunctionOfLiterals(logic::Conjunction con);
   /**
    * Removes all the elements from the body of the clause.
    */
   void resetBody() { body.clear(); }
 };
 /// Defines a pointer to a DisjunctionOfConjunctionsClause
-typedef shared_ptr<DisjunctionOfConjunctionsClause>
-    DisjunctionOfConjunctionsClausePtr;
+typedef std::shared_ptr<DisjunctionOfConjunctionsClause> DisjunctionOfConjunctionsClausePtr;
 
 /** @brief Implements the Abduction algorithm for penalty logic using high order
  * recurrent neural networks
@@ -133,7 +128,7 @@ class HighOrderHopfieldNetwork : public NNBuilderAlgo {
    * @return An eclipse prolog word that contains a conjunction of the elements
    * passed in the list.
    */
-  static eclipse_pl::EC_word createConjunction(list<LiteralPtr>& con);
+  static eclipse_pl::EC_word createConjunction(std::list<logic::LiteralPtr>& con);
   /**
    * Creates an eclipse prolog representing a disjunction of the conjunction
    * elements in the list.
@@ -192,8 +187,8 @@ class HighOrderHopfieldNetwork : public NNBuilderAlgo {
    * @return A string representation of the polynomial that represents this
    * clause.
    */
-  static string createPolynomial(DisjunctionOfConjunctionsClausePtr cl);
-  static list<string> createTableRow(string monom);
+  static std::string createPolynomial(DisjunctionOfConjunctionsClausePtr cl);
+  static std::list<std::string> createTableRow(std::string monom);
   /**
    * Transforms a string that contains a polynomial (with not exponentials) and
    * creates a table which can be used to build the hyperlinks of the High order
@@ -205,13 +200,13 @@ class HighOrderHopfieldNetwork : public NNBuilderAlgo {
    * component represents the coefficient and the second is a list with the id's
    * of the variables of the monomial
    */
-  static list<pair<string, list<string> > > createTable(string poly);
+  static std::list<std::pair<sstd::tring, std::list<std::string> > > createTable(std::string poly);
 
  public:
   HighOrderHopfieldNetwork();
   virtual ~HighOrderHopfieldNetwork() {};
 
-  virtual NeuralNetworkPtr buildNetwork(ProgramPtr pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(ProgramPtr pr);
   /**
    * Creates a temporal program with the given clauses and uses the methods of a
    * program object to compute automatically the abductibles and observations.
@@ -219,11 +214,8 @@ class HighOrderHopfieldNetwork : public NNBuilderAlgo {
    *
    * @see buildNetwork(ProgramPtr pr)
    */
-  virtual NeuralNetworkPtr buildNetwork(set<ClausePtr> pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(std::set<ClausePtr> pr);
 };
 
 }  // namespace algorithms
-
 }  // namespace nalso
-
-#endif /* HOHOPFIELD_H_ */
