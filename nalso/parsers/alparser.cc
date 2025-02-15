@@ -9,7 +9,7 @@
 
 #include <set>
 
-#include "nalso/logic/program.hh"
+#include "nalso/logic/logic.hh"
 
 namespace nalso {
 

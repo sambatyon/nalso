@@ -1,7 +1,7 @@
 cc_library(
   name = "logic",
   deps = ["//nalso/utils"],
-  srcs = ["program.cc"],
-  hdrs = ["program.hh"],
+  srcs = ["logic.cc"],
+  hdrs = ["logic.hh"],
   visibility = ["//visibility:public"],
 )

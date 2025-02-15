@@ -6,7 +6,7 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "nalso/logic/program.hh"
+#include "nalso/logic/logic.hh"
 #include "nalso/neural/neuralnetwork.hh"
 
 #include <set>

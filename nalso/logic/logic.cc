@@ -5,7 +5,7 @@
  *      Author: Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "program.hh"
+#include "logic.hh"
 
 #include "nalso/utils/utils.hh"
 

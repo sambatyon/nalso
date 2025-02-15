@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 
-#include "nalso/logic/program.hh"
+#include "nalso/logic/logic.hh"
 #include "nalso/utils/utils.hh"
 
 namespace nalso {
