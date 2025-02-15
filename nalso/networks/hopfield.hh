@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file hopfield.h
  *
@@ -8,33 +9,26 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef HOPFIELD_H_
-#define HOPFIELD_H_
+#include "nalso/networks/neuralnetwork.hh"
 
-#include <boost/shared_ptr.hpp>
 #include <cmath>
 #include <list>
 #include <map>
 #include <vector>
 
-#include "neuralnetwork.hh"
-
 namespace nalso {
-
 namespace neural {
-using namespace boost;
-using namespace std;
 
 class HopfieldNode;
-typedef shared_ptr<HopfieldNode> HopfieldNodePtr;
+typedef std::shared_ptr<HopfieldNode> HopfieldNodePtr;
 
 /**
  * A hyper connection is a pair (doube, list of nodes) whose first parameter is
  * the weight of the connection and the second is a list of pointers to the
  * involved nodes.
  */
-typedef pair<double, list<HopfieldNodePtr> > HyperConnection;
-typedef shared_ptr<HyperConnection> HyperConnectionPtr;
+typedef std::pair<double, std::list<HopfieldNodePtr> > HyperConnection;
+typedef std::shared_ptr<HyperConnection> HyperConnectionPtr;
 
 /**
  * @brief A continuous hyper degree hopfield node
@@ -45,11 +39,11 @@ typedef shared_ptr<HyperConnection> HyperConnectionPtr;
  */
 class HopfieldNode {
  private:
-  string id;
-  list<HyperConnectionPtr> inputs;
+  std::string id;
+  std::list<HyperConnectionPtr> inputs;
   double potential;
   double nextPotential;
-  shared_ptr<double> coolingFactor;
+  std::shared_ptr<double> coolingFactor;
 
  public:
   /**
@@ -61,7 +55,7 @@ class HopfieldNode {
    * neuron should slow down. It is a pointer, so the cooling ration can be
    * managed from the network itself.
    */
-  HopfieldNode(string _id, shared_ptr<double> _coolingFactor)
+  HopfieldNode(std::string _id, std::shared_ptr<double> _coolingFactor)
       : id(_id),
         potential(NAN),
         nextPotential(NAN),
@@ -76,7 +70,7 @@ class HopfieldNode {
    * neuron should slow down. It is a pointer, so the cooling ration can be
    * managed from the network itself.
    */
-  HopfieldNode(string _id) : id(_id), potential(NAN), nextPotential(NAN) {};
+  HopfieldNode(std::string _id) : id(_id), potential(NAN), nextPotential(NAN) {};
 
   /**
    * Creates a hopfield node with the given id and a pointer to a double so the
@@ -94,7 +88,9 @@ class HopfieldNode {
    * Returns the output value of the unit, which is the sigmoid(potential /
    * coolingFactor)
    */
-  double outputValue() { return 1 / (1 + exp(-potential / *coolingFactor)); }
+  double outputValue() {
+    return 1 / (1 + std::exp(-potential / *coolingFactor));
+  }
 
   /**
    * Compute the next value for the potential of the unit. Which is the addition
@@ -113,10 +109,11 @@ class HopfieldNode {
    */
   void addToHyperConnection(HyperConnectionPtr conn,
                             HopfieldNodePtr _this = HopfieldNodePtr()) {
-    if (_this.get())
+    if (_this.get()) {
       (*conn).second.push_back(_this);
-    else
+    } else {
       (*conn).second.push_back(HopfieldNodePtr(this));
+    }
     inputs.push_back(conn);
   };
 
@@ -145,16 +142,18 @@ class HopfieldNode {
    *
    * @return nextPotential value
    */
-  double getNextPotential() { return nextPotential; }
+  double getNextPotential() {
+    return nextPotential;
+  }
   /**
    * Getter of the potential value
    *
    * @return the value hold in potential
    */
   double getPotential() { return potential; }
-  string getId() { return id; }
-  shared_ptr<double> getCoolingFactor() { return coolingFactor; }
-  void setCoolingFactor(shared_ptr<double> _factor) { coolingFactor = _factor; }
+  std::string getId() { return id; }
+  std::shared_ptr<double> getCoolingFactor() { return coolingFactor; }
+  void setCoolingFactor(std::shared_ptr<double> _factor) { coolingFactor = _factor; }
 };
 
 /**
@@ -167,13 +166,13 @@ class HopfieldNode {
  *
  * @author Alexander Rojas
  */
-class HopfieldNeuralNetwork : public nalso::neural::NeuralNetwork {
+class HopfieldNeuralNetwork : public NeuralNetwork {
  private:
 #ifdef DEBUG
-  list<pair<double, vector<HopfieldNodePtr> > > connections;
+  std::list<std::pair<double, std::vector<HopfieldNodePtr> > > connections;
 #endif
-  map<string, HopfieldNodePtr> nodes;
-  shared_ptr<double> coolingFactor;
+  std::map<std::string, HopfieldNodePtr> nodes;
+  std::shared_ptr<double> coolingFactor;
 
  public:
   HopfieldNeuralNetwork(double initCool = 1)
@@ -198,7 +197,7 @@ class HopfieldNeuralNetwork : public nalso::neural::NeuralNetwork {
    *
    * @param weight the weight of the hyperedge
    */
-  void connectNodes(vector<HopfieldNodePtr> _nodes, double weight = 1);
+  void connectNodes(std::vector<HopfieldNodePtr> _nodes, double weight = 1);
 
   /**
    * Search for the nodes with the labels contained in the vector _nodeNames. If
@@ -210,7 +209,7 @@ class HopfieldNeuralNetwork : public nalso::neural::NeuralNetwork {
    *
    * @param weight the weight of the connection.
    */
-  void connectNodes(vector<string> _nodeNames, double weight = 1);
+  void connectNodes(std::vector<std::string> _nodeNames, double weight = 1);
 
   virtual ParamsMap evaluate(ParamsMap& input);
 
@@ -225,7 +224,4 @@ class HopfieldNeuralNetwork : public nalso::neural::NeuralNetwork {
 };
 
 }  // namespace neural
-
 }  // namespace nalso
-
-#endif /* HOPFIELD_H_ */

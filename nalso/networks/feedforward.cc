@@ -5,23 +5,25 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "feedforward.hh"
+#include "nalso/networks/feedforward.hh"
 
 #include <sstream>
 
-#include "utils/utils.hh"
+#include "nalso/utils/utils.hh"
 
 namespace nalso {
 
 namespace neural {
 
 FeedForwardNeuralNetwork::FeedForwardNeuralNetwork() {
-  vector<NeuralNodePtr> tmp;
+  std::vector<NeuralNodePtr> tmp;
   nodes.push_back(tmp);
 }
 
 FeedForwardNeuralNetwork::~FeedForwardNeuralNetwork() {
-  for (unsigned int i = 0; i < nodes.size(); i++) nodes[i].clear();
+  for (unsigned int i = 0; i < nodes.size(); i++) {
+    nodes[i].clear();
+  }
   nodes.clear();
 }
 
@@ -29,21 +31,23 @@ void FeedForwardNeuralNetwork::addNode(NeuralNodePtr node,
                                        int subNetwork /*= 0*/) {
   // if the neuron is of type INPUT, then we create the equivalent NeuralEnd
   // object we connect the new end to the given node and add it to the inputs
-  // vector
+  // std::vector
   if ((node->getType() & INPUT) == INPUT) {
     // This is done so there's no problem when creating the connection with the
     // real output.
     (*node).setType((*node).getType() & ~INPUT);
     // IMPORTANT the id of the inputs and outputs networks include the
     // subnetwork they belong to as a prefix
-    stringstream ss;
+    std::stringstream ss;
     ss << "w" << subNetwork << "-" << node->getId();
     // we delete the indicator of and input unit to facilitate the fixpoint
     // method
-    string id = ss.str();
-    string sub = id.substr(id.length() - 2, 2);
-    string comp("_i");
-    if (sub == comp) id.erase(id.end() - 2, id.end());
+    std::string id = ss.str();
+    std::string sub = id.substr(id.length() - 2, 2);
+    std::string comp("_i");
+    if (sub == comp) {
+      id.erase(id.end() - 2, id.end());
+    }
     NeuralEndPtr end(new NeuralEnd(id, true));
     ProxyElem tmp(ss.str(), end);
     inputs.insert(tmp);
@@ -52,20 +56,20 @@ void FeedForwardNeuralNetwork::addNode(NeuralNodePtr node,
 
   // if the neuron is of type OUTPUT, then we create the equivalent NeuralEnd
   // object we connect the given node to the new end and add it to the outputs
-  // vector
+  // std::vector
   if ((node->getType() & OUTPUT) == OUTPUT) {
     // This is done so there's no problem when creating the connection with the
     // real output.
     (*node).setType((*node).getType() & ~OUTPUT);
     // IMPORTANT the id of the inputs and outputs networks include the
     // subnetwork they belong to as a prefix
-    stringstream ss;
+    std::stringstream ss;
     ss << "w" << subNetwork << "-" << node->getId();
     // we delete the indicator of and output unit to facilitate the fixpoint
     // method
-    string id = ss.str();
-    string sub = id.substr(id.length() - 2, 2);
-    string comp("_o");
+    std::string id = ss.str();
+    std::string sub = id.substr(id.length() - 2, 2);
+    std::string comp("_o");
     if (sub == comp) id.erase(id.end() - 2, id.end());
     NeuralEndPtr end(new NeuralEnd(ss.str(), false));
     ProxyElem tmp(id, end);
@@ -84,14 +88,17 @@ bool FeedForwardNeuralNetwork::connectNodes(NeuralConnectionPtr source,
   return NeuralConnection::connect(source, dest, weight);
 }
 
-bool FeedForwardNeuralNetwork::connectNodes(string sourceId, string destId,
+bool FeedForwardNeuralNetwork::connectNodes(std::string sourceId, std::string destId,
                                             double weight /*=1*/,
                                             int subNetSource /*= 0*/,
                                             int subNetDest /*= 0*/) {
-  if (subNetSource > (int)nodes.size() || subNetDest > (int)nodes.size())
+  if (subNetSource > (int)nodes.size() || subNetDest > (int)nodes.size()) {
     return false;
+  }
 
-  if (subNetSource < 0 || subNetDest < 0) return false;
+  if (subNetSource < 0 || subNetDest < 0) {
+    return false;
+  }
 
   NeuralNodePtr source, dest;
   // search all layers for the source unit
@@ -110,21 +117,24 @@ bool FeedForwardNeuralNetwork::connectNodes(string sourceId, string destId,
     }
   }
 
-  if (!(source.get() && dest.get())) return false;
+  if (!(source.get() && dest.get())) {
+    return false;
+  }
 
   return connectNodes(source, dest, weight);
 }
 
 ParamsMap FeedForwardNeuralNetwork::evaluate(ParamsMap& input) {
   ParamsMap::iterator it;
-  for (it = input.begin(); it != input.end(); it++)
-    if (inputs.find((*it).first) != inputs.end())
+  for (it = input.begin(); it != input.end(); it++) {
+    if (inputs.find((*it).first) != inputs.end()) {
       inputs[(*it).first]->setOutputValue((*it).second);
+    }
+  }
 
-  map<string, shared_ptr<NeuralEnd> >::iterator oit;
-  map<string, double> res;
-  for (oit = outputs.begin(); oit != outputs.end(); oit++) {
-    pair<string, double> resElem((*oit).first,
+  std::map<std::string, double> res;
+  for (auto oit = outputs.begin(); oit != outputs.end(); oit++) {
+    std::pair<std::string, double> resElem((*oit).first,
                                  (*oit).second->outputValue(true));
     res.insert(resElem);
   }
@@ -133,45 +143,46 @@ ParamsMap FeedForwardNeuralNetwork::evaluate(ParamsMap& input) {
 }
 
 void FeedForwardNeuralNetwork::reset() {
-  for (map<string, NeuralEndPtr>::iterator it = outputs.begin();
-       it != outputs.end(); it++)
+  for (auto it = outputs.begin(); it != outputs.end(); it++) {
     (*(*it).second).reset();
+  }
 
-  for (map<string, NeuralEndPtr>::iterator it = inputs.begin();
-       it != inputs.end(); it++)
+  for (auto it = inputs.begin(); it != inputs.end(); it++) {
     (*(*it).second).reset();
+  }
 
-  for (unsigned int i = 0; i < nodes.size(); i++)
-    for (unsigned int j = 0; j < nodes[i].size(); j++) (*nodes[i][j]).reset();
+  for (unsigned int i = 0; i < nodes.size(); i++) {
+    for (unsigned int j = 0; j < nodes[i].size(); j++) {
+      (*nodes[i][j]).reset();
+    }
+  }
 }
 
 #ifdef DEBUG
-
-string FeedForwardNeuralNetwork::debugString() {
-  string res =
+std::string FeedForwardNeuralNetwork::debugString() {
+  std::string res =
       "digraph hopfield{\n\tnode [shape=plaintext, fontsize=10];\n\tedge "
       "[arrowhead=none];\n";
 
   res += "\t{\n\t\trank=same;\n";
-  for (map<string, NeuralEndPtr>::iterator input = inputs.begin();
-       input != inputs.end(); input++)
+  for (auto input = inputs.begin(); input != inputs.end(); input++) {
     res += "\t\t" + utils::removeMinus((*input).first) + ";\n";
+  }
   res += "\t}\n";
 
   res += "\t{\n\t\trank=same;\n";
-  for (map<string, NeuralEndPtr>::iterator output = outputs.begin();
-       output != outputs.end(); output++)
+  for (auto output = outputs.begin(); output != outputs.end(); output++) {
     res += "\t\t" + utils::removeMinus((*output).first) + ";\n";
+  }
   res += "\t}\n";
 
-  for (map<string, NeuralEndPtr>::iterator output = outputs.begin();
-       output != outputs.end(); output++)
+  for (auto output = outputs.begin(); output != outputs.end(); output++){
     res += (*output).second->debugString();
+  }
   res += "}";
   return res;
 }
 #endif
 
 }  // namespace neural
-
 }  // namespace nalso

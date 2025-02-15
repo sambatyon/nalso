@@ -5,96 +5,103 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "hopfield.hh"
+#include "nalso/networks/hopfield.hh"
 
 namespace nalso {
-
 namespace neural {
 
 void HopfieldNode::computeNextPotential() {
   nextPotential = 0;
   // iterate over every node
-  for (list<HyperConnectionPtr>::iterator hcit = inputs.begin();
-       hcit != inputs.end(); hcit++) {
+  for (auto hcit = inputs.begin(); hcit != inputs.end(); hcit++) {
     // weight * (V_1 * ... * V_n) where i != this
     double mult = (**hcit).first;
     // CHECK THIS
-    if ((**hcit).second.size() == 1 && (*(**hcit).second.begin()).get() == this)
+    if ((**hcit).second.size() == 1 && (*(**hcit).second.begin()).get() == this) {
       mult = 0;
-    for (list<HopfieldNodePtr>::iterator nit = (**hcit).second.begin();
-         nit != (**hcit).second.end(); nit++)
-      if ((*nit).get() != this) mult *= (**nit).outputValue();
+    }
+    for (auto nit = (**hcit).second.begin(); nit != (**hcit).second.end(); nit++) {
+      if ((*nit).get() != this) {
+        mult *= (**nit).outputValue();
+      }
+    }
     nextPotential += mult;
   }
 
   nextPotential += potential;
 }
 
-void HopfieldNeuralNetwork::connectNodes(vector<HopfieldNodePtr> _nodes,
+void HopfieldNeuralNetwork::connectNodes(std::vector<HopfieldNodePtr> _nodes,
                                          double weight /* = 1*/) {
 #ifdef DEBUG
   connections.push_back(make_pair(weight, _nodes));
 #endif
   HyperConnectionPtr conn(new HyperConnection);
   (*conn).first = weight;
-  for (unsigned int i = 0; i < _nodes.size(); i++)
+  for (unsigned int i = 0; i < _nodes.size(); i++) {
     (*_nodes[i]).addToHyperConnection(conn, _nodes[i]);
+  }
 }
 
-void HopfieldNeuralNetwork::connectNodes(vector<string> _nodeNames,
+void HopfieldNeuralNetwork::connectNodes(std::vector<std::string> _nodeNames,
                                          double weight /* = 1*/) {
-  vector<HopfieldNodePtr> _nodes;
-  for (unsigned int i = 0; i < _nodeNames.size(); i++)
-    if (nodes.find(_nodeNames[i]) != nodes.end())
+  std::vector<HopfieldNodePtr> _nodes;
+  for (unsigned int i = 0; i < _nodeNames.size(); i++) {
+    if (nodes.find(_nodeNames[i]) != nodes.end()) {
       _nodes.push_back(nodes[_nodeNames[i]]);
+    }
+  }
 
   connectNodes(_nodes, weight);
 }
 
 ParamsMap HopfieldNeuralNetwork::evaluate(ParamsMap& input) {
-  ParamsMap::iterator it;
-  for (it = input.begin(); it != input.end(); it++)
-    if (nodes.find((*it).first) != nodes.end())
+  for (auto it = input.begin(); it != input.end(); it++) {
+    if (nodes.find((*it).first) != nodes.end()) {
       (*nodes[(*it).first]).setInitialPotential((*it).second);
+    }
+  }
 
-  map<string, double> res;
-  for (map<string, HopfieldNodePtr>::iterator nit = nodes.begin();
-       nit != nodes.end(); nit++)
+  std::map<std::string, double> res;
+  for (auto nit = nodes.begin(); nit != nodes.end(); nit++) {
     res.insert(make_pair((*nit).first, (*(*nit).second).outputValue()));
+  }
   return res;
 }
 
 ParamsMap HopfieldNeuralNetwork::findFixPoint(ParamsMap input,
                                               double tolerance /* = 0*/) {
   // first set the inputs as the initial potential set.
-  ParamsMap::iterator it;
-  for (it = input.begin(); it != input.end(); it++)
-    if (nodes.find((*it).first) != nodes.end())
+  for (auto it = input.begin(); it != input.end(); it++) {
+    if (nodes.find((*it).first) != nodes.end()) {
       (*nodes[(*it).first]).setInitialPotential((*it).second);
+    }
+  }
 
   ParamsMap outOld, outNew;
-  map<string, HopfieldNodePtr>::iterator nit;
   // evaluate the network with the initial potential
-  for (map<string, HopfieldNodePtr>::iterator nit = nodes.begin();
-       nit != nodes.end(); nit++)
+  for (auto nit = nodes.begin(); nit != nodes.end(); nit++) {
     outNew.insert(make_pair((*nit).first, (*(*nit).second).outputValue()));
+  }
 
   do {
     outOld = outNew;  // the new becomes old
     outNew.clear();
 
     // compute the next potential value
-    for (nit = nodes.begin(); nit != nodes.end(); nit++)
+    for (auto nit = nodes.begin(); nit != nodes.end(); nit++) {
       (*(*nit).second).computeNextPotential();
+    }
 
     // update potential
-    for (nit = nodes.begin(); nit != nodes.end(); nit++)
+    for (auto nit = nodes.begin(); nit != nodes.end(); nit++) {
       (*(*nit).second).updatePotential();
+    }
 
     // evaluate the network with the new potential
-    for (map<string, HopfieldNodePtr>::iterator nit = nodes.begin();
-         nit != nodes.end(); nit++)
+    for (auto nit = nodes.begin(); nit != nodes.end(); nit++) {
       outNew.insert(make_pair((*nit).first, (*(*nit).second).outputValue()));
+    }
   } while (!NeuralNetwork::areEqualParameters(outNew, outOld, tolerance));
 
   return outNew;
@@ -102,8 +109,8 @@ ParamsMap HopfieldNeuralNetwork::findFixPoint(ParamsMap input,
 
 #ifdef DEBUG
 std::string HopfieldNeuralNetwork::debugString() {
-  list<string> colors;
-  list<string> colorstmp;
+  std::list<string> colors;
+  std::list<string> colorstmp;
   colors.push_back("coral");
   colors.push_back("beige");
   colors.push_back("darkorange");
@@ -146,17 +153,17 @@ std::string HopfieldNeuralNetwork::debugString() {
   string res =
       "digraph hopfield{\n\tnode [shape=plaintext, fontsize=10];\n\tedge "
       "[arrowhead=none];\n";
-  for (list<pair<double, vector<HopfieldNodePtr> > >::iterator link =
-           connections.begin();
-       link != connections.end(); link++) {
-    string current_color = colors.front();
+  for (auto link = connections.begin(); link != connections.end(); link++) {
+    std::string current_color = colors.front();
     colorstmp.push_back(current_color);
     colors.pop_front();
-    if (colors.empty()) colors = colorstmp;
-    if ((*link).second.size() == 1)
+    if (colors.empty()) {
+      colors = colorstmp;
+    }
+    if ((*link).second.size() == 1) {
       res += "\t" + (*link).second[0]->getId() + ":s->" +
              (*link).second[0]->getId() + ":n [color=" + current_color + "];\n";
-    else {
+    } else {
       string first = (*link).second[0]->getId();
       string last =
           first;  // = (*link).second[(*link).second.size() - 1]->getId();
@@ -174,5 +181,4 @@ std::string HopfieldNeuralNetwork::debugString() {
 #endif
 
 }  // namespace neural
-
 }  // namespace nalso

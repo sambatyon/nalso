@@ -11,18 +11,17 @@ namespace nalso {
 
 namespace neural {
 
-NeuralNode::NeuralNode(string _id, NeuralMethodPtr _method)
+NeuralNode::NeuralNode(std::string _id, NeuralMethodPtr _method)
     : NeuralConnection(_id), method(_method), layer(0), subnetwork(0) {
-  mt19937 generator(static_cast<unsigned int>(std::time(0)));
-  uniform_real<> uni_dist(0, 1);
-  random.reset(new Random(generator, uni_dist));
+  std::random_device rd;
+  random.reset(new Random{std::mt19937(rd()), std::uniform_real_distribution<>(0, 1)});
 
   weights.push_back(0);
   changeInWeights.push_back(0);
   bestWeights.push_back(weights[0]);
 }
 
-NeuralNode::NeuralNode(string _id, NeuralMethodPtr _method, RandomPtr _random)
+NeuralNode::NeuralNode(std::string _id, NeuralMethodPtr _method, RandomPtr _random)
     : NeuralConnection(_id),
       random(_random),
       method(_method),
@@ -107,9 +106,9 @@ bool NeuralNode::disconnectInput(NeuralConnectionPtr i, int n) {
     }
 
     if (loc >= 0) {
-      vector<NeuralConnectionPtr>::iterator ilit = inputList.begin();
-      vector<int>::iterator init = inputNums.begin();
-      vector<double>::iterator wit = weights.begin(),
+      std::vector<NeuralConnectionPtr>::iterator ilit = inputList.begin();
+      std::vector<int>::iterator init = inputNums.begin();
+      std::vector<double>::iterator wit = weights.begin(),
                                chwit = changeInWeights.begin();
       // since the weights vector has one more element for the bias than the
       // input list

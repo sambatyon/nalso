@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file method.h
  *
@@ -10,16 +11,9 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef METHOD_H_
-#define METHOD_H_
-
-#include <cmath>
-#include <vector>
-
-#include "node.hh"
+#include "nalso/networks/node.hh"
 
 namespace nalso {
-
 namespace neural {
 
 class NeuralNode;
@@ -145,5 +139,3 @@ class BipolarSemilinearMethod : public NeuralMethod {
 }  // namespace neural
 
 }  // namespace nalso
-
-#endif /* METHOD_H_ */

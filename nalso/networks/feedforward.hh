@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file feedforward.h
  *
@@ -10,22 +11,17 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef FEEDFORWARD_H_
-#define FEEDFORWARD_H_
-
 #include <map>
 #include <vector>
 
-#include "method.hh"
-#include "neuralnetwork.hh"
-#include "node.hh"
+#include "nalso/networks/method.hh"
+#include "nalso/networks/neuralnetwork.hh"
+#include "nalso/networks/node.hh"
 
 namespace nalso {
-
 namespace neural {
-using namespace std;
 
-typedef pair<string, NeuralEndPtr> ProxyElem;
+typedef std::pair<std::string, NeuralEndPtr> ProxyElem;
 
 /**
  * @brief A feed forward neural network
@@ -41,8 +37,8 @@ typedef pair<string, NeuralEndPtr> ProxyElem;
  */
 class FeedForwardNeuralNetwork : public NeuralNetwork {
  private:
-  map<string, NeuralEndPtr> inputs, outputs;
-  vector<vector<NeuralNodePtr> > nodes;
+  std::map<std::string, NeuralEndPtr> inputs, outputs;
+  std::vector<std::vector<NeuralNodePtr> > nodes;
 
  public:
   /**
@@ -75,19 +71,20 @@ class FeedForwardNeuralNetwork : public NeuralNetwork {
    * it is considered to be an output node.
    */
   void addEndNode(NeuralEndPtr node, bool input = true) {
-    if (input)
+    if (input) {
       inputs.insert(make_pair((*node).getId(), node));
-    else
+    } else {
       outputs.insert(make_pair((*node).getId(), node));
+    }
   }
 
   /**
    * Allocates space for a new subnetwork.
    */
   void allocateSubnetwork() {
-    vector<NeuralNodePtr> tmp;
+    std::vector<NeuralNodePtr> tmp;
     nodes.push_back(tmp);
-  };
+  }
 
   /**
    * Creates a connection between the given units with a weight value passed as
@@ -110,20 +107,22 @@ class FeedForwardNeuralNetwork : public NeuralNetwork {
    * same name, the subnetwork of the nodes must be known. If not, the method
    * will search only in the default subnetwork.
    */
-  bool connectNodes(string sourceId, string destId, double weight = 1,
+  bool connectNodes(std::string sourceId, std::string destId, double weight = 1,
                     int subNetSource = 0, int subNetDest = 0);
 
   virtual ParamsMap evaluate(ParamsMap& input);
 
   /**
-   * Returns a reference to the vector that represents the subnetwork i.
+   * Returns a reference to the std::vector that represents the subnetwork i.
    *
    * @param index of the network to access
    *
-   * @return a reference to the vector that contains the nodes of the subnetwork
+   * @return a reference to the std::vector that contains the nodes of the subnetwork
    * at index.
    */
-  vector<NeuralNodePtr>& operator[](unsigned int index) { return nodes[index]; }
+  std::vector<NeuralNodePtr>& operator[](unsigned int index) {
+    return nodes[index];
+  }
   /**
    * Return the number of subnetworks allocated in the network.
    *
@@ -138,12 +137,9 @@ class FeedForwardNeuralNetwork : public NeuralNetwork {
   void reset();
 
 #ifdef DEBUG
-  virtual string debugString();
+  virtual std::string debugString();
 #endif
 };
 
 }  // namespace neural
-
 }  // namespace nalso
-
-#endif /* FEEDFORWARD_H_ */

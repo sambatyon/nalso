@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file node.h
  *
@@ -9,30 +10,22 @@
  * @date Oct 10, 2009
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
-
-#ifndef NODE_H_
-#define NODE_H_
-
-#include <boost/random.hpp>
-#include <boost/shared_ptr.hpp>
-#include <cmath>
 #include <ctime>
+#include <memory>
+#include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "method.h"
+#include "method.hh"
 
 namespace nalso {
-
 namespace neural {
-
-using namespace boost;
-using namespace std;
 
 class NeuralConnection;
 /// Pointer to a NeuralConnection object
 /// @see NeuralConnection
-typedef shared_ptr<NeuralConnection> NeuralConnectionPtr;
+typedef std::shared_ptr<NeuralConnection> NeuralConnectionPtr;
 
 /**
  * Bitwise flags that describe the behavior of the nodes.
@@ -56,23 +49,23 @@ enum ConnectionType {
 class NeuralConnection {
  protected:
   /** List of incoming connections */
-  vector<NeuralConnectionPtr> inputList;
+  std::vector<NeuralConnectionPtr> inputList;
   /** List of outgoing connections */
-  vector<NeuralConnectionPtr> outputList;
+  std::vector<NeuralConnectionPtr> outputList;
 
   /** The value stored in the i-th element of these vector tells the index of
    * this unit in the outputList of the i-th node in the inputList */
-  vector<int> inputNums;
+  std::vector<int> inputNums;
   /** The value stored in the i-th element of these vector tells the index of
    * this unit in the inputList of the i-th node in the outputList */
-  vector<int> outputNums;
+  std::vector<int> outputNums;
 
   double unitValue, unitError;
 
   bool weightsUpdated; /** keeps track of which units have updated its weights
                           already after each iteration */
 
-  string id; /** Unique identifier of the node inside a network */
+  std::string id; /** Unique identifier of the node inside a network */
 
   /**
    * Describes the behavior of this node using the values described in
@@ -83,7 +76,7 @@ class NeuralConnection {
   int type;
 
  public:
-  NeuralConnection(string _id);
+  NeuralConnection(std::string _id);
   virtual ~NeuralConnection();
 
   /**
@@ -91,7 +84,7 @@ class NeuralConnection {
    *
    * @return the unique id of the node
    */
-  string getId() { return id; }
+  std::string getId() { return id; }
   /**
    * Getter of the type attribute.
    *
@@ -216,7 +209,7 @@ class NeuralConnection {
    * to do that)
    * @return A reference to the inputs list.
    */
-  vector<NeuralConnectionPtr>& getInputs() { return inputList; }
+  std::vector<NeuralConnectionPtr>& getInputs() { return inputList; }
 
   /**
    * Use this to get easy access to the outputs. It is not advised to change
@@ -224,7 +217,7 @@ class NeuralConnection {
    * to do that)
    * @return a reference to the outputs list.
    */
-  vector<NeuralConnectionPtr>& getOutputs() { return outputList; }
+  std::vector<NeuralConnectionPtr>& getOutputs() { return outputList; }
 
   /**
    * Use this to get easy access to the input numbers. It is not advised to
@@ -233,7 +226,7 @@ class NeuralConnection {
    *
    * @return A reference to the input nums list.
    */
-  vector<int>& getInputNums() { return inputNums; }
+  std::vector<int>& getInputNums() { return inputNums; }
 
   /**
    * Use this to get easy access to the output numbers. It is not advised to
@@ -242,7 +235,7 @@ class NeuralConnection {
    *
    * @return The outputs list.
    */
-  vector<int>& getOutputNums() { return outputNums; }
+  std::vector<int>& getOutputNums() { return outputNums; }
 
   /**
    * This method will remove all the inputs to this unit. In doing so it
@@ -411,7 +404,7 @@ class NeuralEnd : public NeuralConnection {
    * @param _input true if the new node is to be an input node, false if it is
    * to behave like an output one.
    */
-  NeuralEnd(string _id, bool _input = true);
+  NeuralEnd(std::string _id, bool _input = true);
   virtual ~NeuralEnd() {}
 
   /**
@@ -471,15 +464,22 @@ class NeuralEnd : public NeuralConnection {
 
 /// Pointer to a neuralEnd object
 /// @see NeuralEnd
-typedef shared_ptr<NeuralEnd> NeuralEndPtr;
+typedef std::shared_ptr<NeuralEnd> NeuralEndPtr;
 
 class NeuralMethod;
 /// Pointer to a NeuralMethod object
 /// @see nalso::neural::NeuralMethod
-typedef shared_ptr<NeuralMethod> NeuralMethodPtr;
+typedef std::shared_ptr<NeuralMethod> NeuralMethodPtr;
 
-typedef variate_generator<mt19937&, boost::uniform_real<> > Random;
-typedef shared_ptr<Random> RandomPtr;
+struct Random {
+  std::mt19937 generator;
+  std::uniform_real_distribution<> dist;
+
+  double operator()() {
+    return dist(generator);
+  }
+};
+typedef std::shared_ptr<Random> RandomPtr;
 
 /**
  * @brief Hidden nodes.
@@ -499,8 +499,8 @@ class NeuralNode : public NeuralConnection {
    * Therefore, the size of this vector is always one more than the size of the
    * inputList vector.
    */
-  vector<double> weights;
-  vector<double> bestWeights, changeInWeights;
+  std::vector<double> weights;
+  std::vector<double> bestWeights, changeInWeights;
 
   RandomPtr random;
 
@@ -516,7 +516,7 @@ class NeuralNode : public NeuralConnection {
    *
    * @param _method Activation function for the current unit.
    */
-  NeuralNode(string _id, NeuralMethodPtr _method);
+  NeuralNode(std::string _id, NeuralMethodPtr _method);
   /**
    * Creates a NeuralNode object with the given identifier and method.
    *
@@ -527,7 +527,7 @@ class NeuralNode : public NeuralConnection {
    * @param _random Random generator object to initialize weights and bias when
    * training
    */
-  NeuralNode(string _id, NeuralMethodPtr _method, RandomPtr _random);
+  NeuralNode(std::string _id, NeuralMethodPtr _method, RandomPtr _random);
   virtual ~NeuralNode() {}
 
   /**
@@ -586,13 +586,13 @@ class NeuralNode : public NeuralConnection {
    *
    * @return a reference to the weights attribute.
    */
-  vector<double>& getWeights() { return weights; }
+  std::vector<double>& getWeights() { return weights; }
   /**
    * Getter for the changeInWeights attribute.
    *
    * @return a reference to the changeInWeights attribute.
    */
-  vector<double>& getChangeInWeights() { return changeInWeights; }
+  std::vector<double>& getChangeInWeights() { return changeInWeights; }
 
   void updateWeights(double learning, double momentum);
 
@@ -652,10 +652,7 @@ class NeuralNode : public NeuralConnection {
 
 /// Pointer to a neural node object
 /// @see NeuralNode
-typedef shared_ptr<NeuralNode> NeuralNodePtr;
+typedef std::shared_ptr<NeuralNode> NeuralNodePtr;
 
 }  // namespace neural
-
 }  // namespace nalso
-
-#endif  // NODE_H_

@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file neuralnetwork.h
  *
@@ -10,12 +11,9 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef NEURALNETWORK_H_
-#define NEURALNETWORK_H_
-
-#include <boost/shared_ptr.hpp>
 #include <cmath>
 #include <map>
+#include <memory>
 #include <string>
 
 namespace nalso {
@@ -125,9 +123,7 @@ class NeuralNetwork {
 #endif
 };
 
-typedef boost::shared_ptr<NeuralNetwork> NeuralNetworkPtr;
+typedef std::shared_ptr<NeuralNetwork> NeuralNetworkPtr;
 
 }  // namespace neural
 }  // namespace nalso
-
-#endif /* NEURALNETWORK_H_ */
