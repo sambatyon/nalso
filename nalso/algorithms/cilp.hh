@@ -10,7 +10,7 @@
  */
 
 #include "nalso/algorithms/networkbuilder.hh"
-#include "nalso/networks/feedforward.hh"
+#include "nalso/neural/feedforward.hh"
 #include "nalso/utils/utils.hh"
 
 #include <map>

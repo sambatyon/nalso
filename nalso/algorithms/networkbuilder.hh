@@ -7,7 +7,7 @@
  */
 
 #include "nalso/logic/program.hh"
-#include "nalso/networks/neuralnetwork.hh"
+#include "nalso/neural/neuralnetwork.hh"
 
 #include <set>
 

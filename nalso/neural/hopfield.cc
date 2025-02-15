@@ -5,7 +5,7 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "nalso/networks/hopfield.hh"
+#include "hopfield.hh"
 
 namespace nalso {
 namespace neural {

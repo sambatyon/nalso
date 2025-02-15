@@ -9,7 +9,7 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "nalso/networks/neuralnetwork.hh"
+#include "nalso/neural/neuralnetwork.hh"
 
 #include <cmath>
 #include <list>

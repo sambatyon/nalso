@@ -5,7 +5,7 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "nalso/networks/node.hh"
+#include "node.hh"
 
 #include <cmath>
 

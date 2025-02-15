@@ -8,7 +8,7 @@
  #include <cmath>
  #include <vector>
 
-#include "nalso/networks/method.hh"
+#include "method.hh"
 
 namespace nalso {
 namespace neural {

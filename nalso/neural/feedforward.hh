@@ -14,9 +14,9 @@
 #include <map>
 #include <vector>
 
-#include "nalso/networks/method.hh"
-#include "nalso/networks/neuralnetwork.hh"
-#include "nalso/networks/node.hh"
+#include "nalso/neural/method.hh"
+#include "nalso/neural/neuralnetwork.hh"
+#include "nalso/neural/node.hh"
 
 namespace nalso {
 namespace neural {

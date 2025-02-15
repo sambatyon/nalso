@@ -8,7 +8,7 @@ cc_library(
   deps = [
     "//nalso/utils",
     "//nalso/logic",
-    "//nalso/networks:neural",
+    "//nalso/neural",
   ],
   visibility = ["//visibility:public"],
 )

@@ -5,7 +5,7 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#include "nalso/networks/feedforward.hh"
+#include "feedforward.hh"
 
 #include <sstream>
 
