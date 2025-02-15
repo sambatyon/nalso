@@ -7,36 +7,41 @@
 
 #include "cilp.hh"
 
-namespace nalso {
+#include <algorithm>
+#include <cmath>
+#include <sstream>
+#include <vector>
 
+namespace nalso {
 namespace algorithms {
 
 Cilp::~Cilp() {}
 
-void Cilp::computeParams(set<ClausePtr>& clauses, double& amin, double& w,
-                         double beta, map<string, int>& mus) {
-  vector<int> ks;
+void Cilp::computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
+                         double beta, std::map<std::string, int>& mus) {
+  std::vector<int> ks;
 
   // count how many times each propositional variable appears as the head of a
   // clause
-  for (set<ClausePtr>::iterator it = clauses.begin(); it != clauses.end();
-       it++) {
-    string head = *(**it).getHead();
-    if (mus.find(head) == mus.end())
+  for (auto it = clauses.begin(); it != clauses.end(); it++) {
+    std::string head = *(**it).getHead();
+    if (mus.find(head) == mus.end()) {
       mus[head] = 1;
-    else
+    } else {
       mus[head]++;
+    }
 
     // keep track of the size of the body of each clause
     ks.push_back((**it).getBody().size());
   }
 
   // mix the length body count with the number of clauses per different head.
-  for (map<string, int>::iterator it = mus.begin(); it != mus.end(); it++)
+  for (auto it = mus.begin(); it != mus.end(); it++) {
     ks.push_back((*it).second);
+  }
 
   // compute the maximum element of the ks vector
-  int maxksmus = *max_element(ks.begin(), ks.end());
+  int maxksmus = *std::max_element(ks.begin(), ks.end());
 
   // Compute the A_min value, i.e. the minimal value where a unit is consider to
   // evaluate to true
@@ -49,63 +54,64 @@ void Cilp::computeParams(set<ClausePtr>& clauses, double& amin, double& w,
       ((log(1 + amin) - log(1 - amin)) / (maxksmus * (amin - 1) + amin + 1));
 }
 
-void Cilp::computeParams(set<ClausePtr>& clauses, double& amin, double& w,
+void Cilp::computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
                          double beta) {
-  map<string, int> mus;
+  std::map<std::string, int> mus;
   computeParams(clauses, amin, w, beta, mus);
 }
 
-set<BoolVarPtr> Cilp::getAtoms(set<ClausePtr>& cls) {
-  set<BoolVarPtr> res;
-  set<BoolVarPtr>::iterator it, inputIt;
+std::set<logicStructs::BoolVarPtr> Cilp::getAtoms(std::set<logicStructs::ClausePtr>& cls) {
+  std::set<logicStructs::BoolVarPtr> res;
   // now we add all the clauses atoms if they're not already in the list
-  for (set<ClausePtr>::iterator clIt = cls.begin(); clIt != cls.end(); clIt++) {
+  for (auto clIt = cls.begin(); clIt != cls.end(); clIt++) {
     // first we check the head.
-    if (!utils::isInSet(res, *(**clIt).getHead(), inputIt))
+    if (!utils::contains(res, *(**clIt).getHead())) {
       res.insert((**clIt).getHead());
+    }
 
     // now we add the variables in the body
-    for (set<LiteralPtr>::iterator bodyIt = (**clIt).getBody().begin();
-         bodyIt != (**clIt).getBody().end(); bodyIt++)
-      if (!utils::isInSet(res, *(**bodyIt).getVar(), it))
+    for (auto bodyIt = (**clIt).getBody().begin(); bodyIt != (**clIt).getBody().end(); bodyIt++) {
+      if (!utils::contains(res, *(**bodyIt).getVar())) {
         res.insert((**bodyIt).getVar());
+      }
+    }
   }
 
   return res;
 }
 
-NeuralNetworkPtr Cilp::buildNetwork(ProgramPtr pr) {
+neural::NeuralNetworkPtr Cilp::buildNetwork(logicStructs::ProgramPtr pr) {
   return buildNetwork(pr->getClauses());
 }
 
-NeuralNetworkPtr Cilp::buildNetwork(set<ClausePtr> cls) {
+neural::NeuralNetworkPtr Cilp::buildNetwork(std::set<logicStructs::ClausePtr> cls) {
   // we compute the parameters.
-  map<string, int> mus;
+  std::map<std::string, int> mus;
   computeParams(cls, amin, w, beta, mus);
 
-  shared_ptr<FeedForwardNeuralNetwork> res(new FeedForwardNeuralNetwork);
+  std::shared_ptr<neural::FeedForwardNeuralNetwork> res(new neural::FeedForwardNeuralNetwork);
 
   // definition of the activation methods to be used
-  NeuralMethodPtr linear(new LinearMethod);
-  NeuralMethodPtr bipolar(new BipolarSemilinearMethod(beta));
+  neural::NeuralMethodPtr linear(new neural::LinearMethod);
+  neural::NeuralMethodPtr bipolar(new neural::BipolarSemilinearMethod(beta));
 
-  set<BoolVarPtr> atoms = getAtoms(cls);
+  std::set<logicStructs::BoolVarPtr> atoms = getAtoms(cls);
 
   // first we create an input and output unit for each variable that appears in
   // the program
-  for (set<BoolVarPtr>::iterator it = atoms.begin(); it != atoms.end(); it++) {
-    string str = **it;
+  for (auto it = atoms.begin(); it != atoms.end(); it++) {
+    std::string str = **it;
     str += "_i";
-    NeuralNodePtr input(new NeuralNode(str, linear));
-    input->setType(INPUT);
+    neural::NeuralNodePtr input(new neural::NeuralNode(str, linear));
+    input->setType(neural::INPUT);
     input->setLayer(0);
 
     res->addNode(input, 0);
 
     str = **it;
     str += "_o";
-    NeuralNodePtr output(new NeuralNode(str, linear));
-    output->setType(OUTPUT);
+    neural::NeuralNodePtr output(new neural::NeuralNode(str, linear));
+    output->setType(neural::OUTPUT);
     output->setLayer(0);
 
     res->addNode(output, 0);
@@ -113,12 +119,12 @@ NeuralNetworkPtr Cilp::buildNetwork(set<ClausePtr> cls) {
 
   // Now we add the hidden nodes. There's one for each clause
   int counter = 0;
-  for (set<ClausePtr>::iterator it = cls.begin(); it != cls.end(); it++) {
-    stringstream name;
+  for (auto it = cls.begin(); it != cls.end(); it++) {
+    std::stringstream name;
     name << "h_" << counter;
     int k = (**it).getBody().size();
 
-    NeuralNodePtr hidden(new NeuralNode(name.str(), bipolar));
+    neural::NeuralNodePtr hidden(new neural::NeuralNode(name.str(), bipolar));
     hidden->setLayer(1);
     hidden->setBias(((1 + amin) * (k - 1) * w) / 2);
 
@@ -126,9 +132,8 @@ NeuralNetworkPtr Cilp::buildNetwork(set<ClausePtr> cls) {
 
     // we connect the newly added node to the nodes that represent the other
     // literals in the clause.
-    for (set<LiteralPtr>::iterator litit = (*it)->getBody().begin();
-         litit != (*it)->getBody().end(); litit++) {
-      string source = *(**litit).getVar();
+    for (auto litit = (*it)->getBody().begin(); litit != (*it)->getBody().end(); litit++) {
+      std::string source = *(**litit).getVar();
       source += "_i";
       res->connectNodes(source, hidden->getId(),
                         (*litit)->isNegated() ? -w : w);
@@ -140,5 +145,4 @@ NeuralNetworkPtr Cilp::buildNetwork(set<ClausePtr> cls) {
 }
 
 }  // namespace algorithms
-
 }  // namespace nalso

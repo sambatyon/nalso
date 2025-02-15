@@ -1,5 +1,5 @@
 cc_library(
-  name = "nnetworks",
+  name = "neural",
   srcs = [
     "connection.cc",
     "end.cc",

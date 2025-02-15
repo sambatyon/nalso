@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file program.h
  * @brief Contains the definition of all the needed structures to represent an
@@ -15,9 +16,7 @@
  *  @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#pragma once
 
-#include <list>
 #include <memory>
 #include <set>
 #include <string>

@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file utils.h
  *
@@ -9,8 +10,6 @@
  * @date Sep 30, 2009
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
-
-#pragma once
 
 #include <memory>
 #include <set>
@@ -38,12 +37,12 @@ namespace utils {
  * value) the the one passed as a reference, false otherwise.
  */
 template <typename T>
-bool isInSet(std::set<std::shared_ptr<T> > &list_, T &elem) {
-  auto it = list_.begin();
-  while (it != list_.end() && elem != **it) {
+bool contains(std::set<std::shared_ptr<T> > &list_, T &elem) {
+  auto it = std::begin(list_);
+  while (it != std::end(list_) && elem != **it) {
     it++;
   }
-  return it == list_.end() ? false : true;
+  return it == std::end(list_) ? false : true;
 }
 
 std::string removeMinus(std::string str);

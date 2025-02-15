@@ -21,19 +21,19 @@ bool AbductLogicProgramParser::check(logicStructs::Program& pr, std::string& mes
   std::set<logicStructs::BoolVarPtr> cls = pr.clausesPropositionalVariables();
 
   for (auto it = obs.begin(); it != obs.end(); it++)
-    if (utils::isInSet(abd, **it)) {
+    if (utils::contains(abd, **it)) {
       message = "The abductibles and observation sets must be disjunct.";
       return false;
     }
 
   for (auto it = abd.begin(); it != abd.end(); it++)
-    if (utils::isInSet(obs, **it)) {
+    if (utils::contains(obs, **it)) {
       message = "The abductibles and observation sets must be disjunct.";
       return false;
     }
 
   for (auto it = obs.begin(); it != obs.end(); it++)
-    if (!utils::isInSet(cls, **it)) {
+    if (!utils::contains(cls, **it)) {
       message = "All observations should appear in the clauses";
       return false;
     }

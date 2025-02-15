@@ -1,3 +1,4 @@
+#pragma once
 /**
  * @file cilp.h
  *
@@ -8,26 +9,16 @@
  * @author Alexander Rojas <alexander.rojas@gmail.com>
  */
 
-#ifndef CILP_H_
-#define CILP_H_
+#include "nalso/algorithms/networkbuilder.hh"
+#include "nalso/networks/feedforward.hh"
+#include "nalso/utils/utils.hh"
 
-#include <algorithm>
-#include <cmath>
 #include <map>
 #include <set>
-#include <sstream>
 #include <string>
-#include <vector>
-
-#include "networkbuilder.hh"
-#include "networks/feedforward.hh"
-#include "utils/utils.hh"
 
 namespace nalso {
-
 namespace algorithms {
-using namespace std;
-using namespace neural;
 
 /**
  * Implements the CILP algorithm as proposed by Artur S. d'Avila Garcez.
@@ -54,8 +45,8 @@ class Cilp : public NNBuilderAlgo {
    * @param[out] mus an array containing the number of clauses for each head in
    * the program. only contains values greather than zero
    */
-  static void computeParams(set<ClausePtr>& clauses, double& amin, double& w,
-                            double beta, map<string, int>& mus);
+  static void computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
+                            double beta, std::map<std::string, int>& mus);
   /**
    * Compute the parameters needed by the CiLP algorithm.
    *
@@ -69,22 +60,19 @@ class Cilp : public NNBuilderAlgo {
    * @param[in] beta The beta value of the activation function of the nodes.
    *
    */
-  static void computeParams(set<ClausePtr>& clauses, double& amin, double& w,
+  static void computeParams(std::set<logicStructs::ClausePtr>& clauses, double& amin, double& w,
                             double beta);
 
-  static set<BoolVarPtr> getAtoms(set<ClausePtr>& cls);
+  static std::set<logicStructs::BoolVarPtr> getAtoms(std::set<logicStructs::ClausePtr>& cls);
 
  public:
   Cilp(double _beta = 1, double _amin = NAN)
       : beta(_beta), amin(_amin), w(NAN) {};
   virtual ~Cilp();
 
-  virtual NeuralNetworkPtr buildNetwork(ProgramPtr pr);
-  virtual NeuralNetworkPtr buildNetwork(set<ClausePtr> pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(logicStructs::ProgramPtr pr);
+  virtual neural::NeuralNetworkPtr buildNetwork(std::set<logicStructs::ClausePtr> pr);
 };
 
 }  // namespace algorithms
-
 }  // namespace nalso
-
-#endif /* CILP_H_ */

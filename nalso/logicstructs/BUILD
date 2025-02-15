@@ -1,5 +1,5 @@
 cc_library(
-  name = "logicstructs",
+  name = "logic",
   deps = ["//nalso/utils"],
   srcs = ["program.cc"],
   hdrs = ["program.hh"],
